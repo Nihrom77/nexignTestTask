@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+</head>
+<body>
+<h1>Выполняем звонок с номера: </h1> <h1 th:text="${msisdn}"></h1>
+
+<span  th:text="${subscriber.name} ${subscriber.lastName} " th:if="isPresent==true"></span>
+
+<span th:text="не найден с номером ${msisdn}" th:if="isPresent==false"></span>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+</head>
+<body>
+
+<h1>Абоненты:</h1>
+
+<table class="subscribers">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Имя</th>
+        <th>Фамилия</th>
+        <th>Номер</th>
+        <th>Баланс</th>
+        <th>Статус</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    <tr th:each="subscriber : ${subscribers}">
+        <td th:text="${subscriber.id}">0</td>
+        <td th:text="${subscriber.name}">1</td>
+        <td th:text="${subscriber.lastName}">2</td>
+        <td th:text="${subscriber.msisdn}">3</td>
+        <td th:text="${subscriber.balance}">3</td>
+        <td th:text="${subscriber.status}">4</td>
+        <td>
+            <a th:href="@{/makecall(msisdn=${subscriber.msisdn})}" href="makecall.html">Сделать звонок</a>
+        </td>
+        <td>
+            <a th:href="@{/sendsms(msisdn=${subscriber.msisdn})}" href="sendsms.html">Отправить sms</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
