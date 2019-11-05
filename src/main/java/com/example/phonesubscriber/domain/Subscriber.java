@@ -7,17 +7,16 @@ import javax.persistence.Id;
 @Entity
 public class Subscriber {
 
-    public final String ACTIVE = "ACTIVE";
-    public final String BLOCKED = "BLOCKED";
+
 
     public Subscriber(String name, String lastName, String msisdn, int balance) {
         setName(name);
         setLastName(lastName);
         setBalance(balance);
         if (balance > 0) {
-            setStatus(ACTIVE);
+            setStatus(Constants.ACTIVE);
         } else {
-            setStatus(BLOCKED);
+            setStatus(Constants.BLOCKED);
         }
         setMsisdn(msisdn);
     }
