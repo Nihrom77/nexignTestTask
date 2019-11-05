@@ -1,12 +1,15 @@
 package com.example.phonesubscriber.domain;
 
+import com.example.phonesubscriber.util.Constants;
+
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+/**
+ * Таблица абонентов.
+ */
 @Entity
 public class Subscriber {
-
 
 
     public Subscriber(String name, String lastName, String msisdn, int balance) {
@@ -21,12 +24,9 @@ public class Subscriber {
         setMsisdn(msisdn);
     }
 
-    public Subscriber(){
+    public Subscriber() {
 
     }
-    @Id
-    @GeneratedValue
-    private int id;
 
     private String name;
 
@@ -34,6 +34,7 @@ public class Subscriber {
 
 
     //Номер абонента
+    @Id
     private String msisdn;
 
     private int balance;
@@ -81,11 +82,11 @@ public class Subscriber {
         this.lastName = lastName;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
+//    public int getId() {
+//        return id;
+//    }
+//
+//    public void setId(int id) {
+//        this.id = id;
+//    }
 }

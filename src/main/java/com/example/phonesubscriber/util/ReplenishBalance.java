@@ -1,5 +1,8 @@
-package com.example.phonesubscriber.domain;
+package com.example.phonesubscriber.util;
 
+/**
+ * Вспомогательный класс для передачи значений полей из формы пополнения баланса.
+ */
 public class ReplenishBalance {
 
     private int amount;

@@ -5,17 +5,21 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.time.LocalDateTime;
 
+/**
+ * Таблица звонков. Аудит звонков по времени и абонентам.
+ */
 @Entity
 public class Call {
 
-    public Call(){
+    public Call() {
 
     }
 
-    public Call(LocalDateTime dt, String msisdn){
+    public Call(LocalDateTime dt, String msisdn) {
         setCallDateTime(dt);
         setMsisdn(msisdn);
     }
+
     @Id
     @GeneratedValue
     private int id;

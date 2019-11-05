@@ -4,18 +4,21 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+/**
+ * Таблица стоимости звонков и SMS.
+ */
 @Entity
-public class Prices {
+public class Price {
     @Id
     @GeneratedValue
     private int id;
 
-    public Prices(int smsPrice, int callPrice){
+    public Price(int smsPrice, int callPrice) {
         setCallPrice(callPrice);
         setSmsPrice(smsPrice);
     }
 
-    public Prices(){
+    public Price() {
 
     }
 
