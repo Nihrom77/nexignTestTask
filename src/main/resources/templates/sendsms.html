@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+</head>
+<body>
+<h2>Отправляем SMS с номера: </h2> <h1 th:text="${msisdn}"></h1>
+
+<span th:text="${result}"></span>
+
+<br>
+<a th:href="@{allSubscribers}">Список всех абонентов</a>
+</body>
+</html>

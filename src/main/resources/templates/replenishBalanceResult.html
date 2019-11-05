@@ -4,9 +4,11 @@
     <meta charset="UTF-8"/>
 </head>
 <body>
-<h2>Выполняем звонок с номера: </h2> <h1 th:text="${msisdn}"></h1>
+<h2>Пополнение баланса для номера: </h2>
+<h3 th:text="${msisdn}"></h3>
 
 <span th:text="${result}"></span>
+
 <br>
 <a th:href="@{allSubscribers}">Список всех абонентов</a>
 </body>

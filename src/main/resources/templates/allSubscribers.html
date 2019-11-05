@@ -33,6 +33,9 @@
         <td>
             <a th:href="@{/sendsms(msisdn=${subscriber.msisdn})}" href="sendsms.html">Отправить sms</a>
         </td>
+        <td>
+            <a th:href="@{replenishBalancePage(msisdn=${subscriber.msisdn})}">Пополнить баланс</a>
+        </td>
     </tr>
     </tbody>
 </table>

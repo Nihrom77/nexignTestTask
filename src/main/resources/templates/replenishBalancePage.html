@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+</head>
+<body>
+<h2>Пополнение баланса: </h2>
+
+
+<form action="#" th:action="@{/replenishBalancePage}" th:object="${repleinesh}" method="post">
+    <p>Номер: <input type="text" th:field="*{msisdn}" /></p>
+    <p>Пополнить баланс на сумму: <input type="text" th:field="*{amount}" /> </p>
+    <p><input type="submit" value="Submit" /> <input type="reset" value="Reset" /></p>
+</form>
+
+
+
+<br>
+<a th:href="@{allSubscribers}">Список всех абонентов</a>
+</body>
+</html>
