@@ -25,6 +25,7 @@ public class Application {
     @Autowired
     private PricesRepository pricesRepository;
 
+
     @PostConstruct
     public void init() {
         repository.save(new Subscriber("Roman", "K.","890955533535",10));

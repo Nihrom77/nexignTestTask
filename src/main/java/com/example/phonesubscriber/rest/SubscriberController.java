@@ -1,9 +1,11 @@
 package com.example.phonesubscriber.rest;
 
+import com.example.phonesubscriber.domain.Call;
 import com.example.phonesubscriber.domain.Constants;
 import com.example.phonesubscriber.domain.Prices;
 import com.example.phonesubscriber.domain.ReplenishBalance;
 import com.example.phonesubscriber.domain.Subscriber;
+import com.example.phonesubscriber.repository.CallsRepository;
 import com.example.phonesubscriber.repository.PricesRepository;
 import com.example.phonesubscriber.repository.SubscriberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class SubscriberController {
@@ -24,13 +29,16 @@ public class SubscriberController {
 
     private final PricesRepository pricesRepo;
 
-    @Value("${callNumInADay}")
-    private int callNumInADay;
+    private final CallsRepository callsRepository;
+
+    @Value("${maxCallNumInADay}")
+    private int maxCallNumInADay;
 
     @Autowired
-    public SubscriberController(SubscriberRepository subsRepo, PricesRepository pricesRepo) {
+    public SubscriberController(SubscriberRepository subsRepo, PricesRepository pricesRepo, CallsRepository callsRepository) {
         this.pricesRepo = pricesRepo;
         this.subsRepo = subsRepo;
+        this.callsRepository = callsRepository;
     }
 
     @GetMapping("/")
@@ -41,26 +49,41 @@ public class SubscriberController {
     }
 
 
+    private int getCallForToday(String msisdn) {
+        Optional<Subscriber> op = subsRepo.findAll().stream().filter((Subscriber s) -> s.getMsisdn().equals(msisdn)).findAny();
+        if (op.isPresent()) {
+            List<Call> calls = callsRepository.findByMsisdnAndCallDateTimeAfter(msisdn, LocalDate.now().atStartOfDay());
+            return calls.size();
+        } else {
+            return 0;
+        }
+    }
+
     @GetMapping("/makecall")
     public String makecallPage(@RequestParam("msisdn") String msisdn, Model model) {
 
         model.addAttribute("msisdn", msisdn);
         Prices price = pricesRepo.findAll().get(0);
         model.addAttribute("result", "Абонент не найден");
-        subsRepo.findAll().stream().filter((Subscriber s) -> s.getMsisdn().equals(msisdn)).findAny().ifPresent(
-                (Subscriber s) -> {
-                    int b = s.getBalance();
-                    if (b - price.getCallPrice() >= 0) {
-                        s.setBalance(b - price.getCallPrice());
-                        s.setStatus(s.getBalance() > 0 ? Constants.ACTIVE : Constants.BLOCKED);
-                        model.addAttribute("result", "Звонок выполнен");
-                    } else {
-                        model.addAttribute("result", "Не достаточно средств для звонка.");
-                    }
+        if (getCallForToday(msisdn)>=maxCallNumInADay){
+            model.addAttribute("result", "Превышен лимит звонков ("+maxCallNumInADay+") в сутки");
+        }else {
+            subsRepo.findAll().stream().filter((Subscriber s) -> s.getMsisdn().equals(msisdn)).findAny().ifPresent(
+                    (Subscriber s) -> {
+                        int b = s.getBalance();
+                        if (b - price.getCallPrice() >= 0) {
+                            s.setBalance(b - price.getCallPrice());
+                            s.setStatus(s.getBalance() > 0 ? Constants.ACTIVE : Constants.BLOCKED);
+                            callsRepository.save(new Call(LocalDateTime.now(), msisdn));
+                            model.addAttribute("result", "Звонок выполнен. Звонков за сегодня "+getCallForToday(msisdn));
+                        } else {
+                            model.addAttribute("result", "Не достаточно средств для звонка.");
+                        }
 
-                    subsRepo.save(s);
-                }
-        );
+                        subsRepo.save(s);
+                    }
+            );
+        }
 
         return "makecall";
     }
