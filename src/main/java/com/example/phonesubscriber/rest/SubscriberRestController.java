@@ -35,10 +35,9 @@ public class SubscriberRestController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public Object subscriberPage(@RequestParam("msisdn") String msisdn, Model model) {
         log.debug("Executing subscriberPage with msisdn = "+msisdn);
-        Subscriber s = subsRepo.findByMsisdn(msisdn);
-        if (s != null) {
-
-            return s;
+        Subscriber subscriber = subsRepo.findByMsisdn(msisdn);
+        if (subscriber != null) {
+            return subscriber;
         } else {
             return "{ \"error\": \"not found\"}";
         }

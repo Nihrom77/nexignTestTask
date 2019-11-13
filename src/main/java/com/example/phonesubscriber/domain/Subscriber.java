@@ -1,6 +1,6 @@
 package com.example.phonesubscriber.domain;
 
-import com.example.phonesubscriber.util.Constants;
+import com.example.phonesubscriber.util.SubscriberStatus;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -17,9 +17,9 @@ public class Subscriber {
         setLastName(lastName);
         setBalance(balance);
         if (balance > 0) {
-            setStatus(Constants.ACTIVE);
+            setStatus(SubscriberStatus.ACTIVE);
         } else {
-            setStatus(Constants.BLOCKED);
+            setStatus(SubscriberStatus.BLOCKED);
         }
         setMsisdn(msisdn);
     }
@@ -40,7 +40,7 @@ public class Subscriber {
     private int balance;
 
     //ACTIVE - активен. BLOCKED - заблокирован
-    private String status;
+    private SubscriberStatus status;
 
     public String getName() {
         return name;
@@ -66,11 +66,11 @@ public class Subscriber {
         this.balance = balance;
     }
 
-    public String getStatus() {
+    public SubscriberStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(SubscriberStatus status) {
         this.status = status;
     }
 
@@ -82,11 +82,4 @@ public class Subscriber {
         this.lastName = lastName;
     }
 
-//    public int getId() {
-//        return id;
-//    }
-//
-//    public void setId(int id) {
-//        this.id = id;
-//    }
 }

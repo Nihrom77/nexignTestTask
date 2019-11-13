@@ -6,8 +6,8 @@ import com.example.phonesubscriber.domain.Subscriber;
 import com.example.phonesubscriber.repository.CallsRepository;
 import com.example.phonesubscriber.repository.PricesRepository;
 import com.example.phonesubscriber.repository.SubscriberRepository;
-import com.example.phonesubscriber.util.Constants;
 import com.example.phonesubscriber.util.ReplenishBalance;
+import com.example.phonesubscriber.util.SubscriberStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -61,8 +61,8 @@ public class SubscriberController {
      * @return число звонков, совершенных указанным номером.
      */
     private int getCallForToday(String msisdn) {
-        Subscriber s = subsRepo.findByMsisdn(msisdn);
-        if (s != null) {
+        Subscriber subscriber = subsRepo.findByMsisdn(msisdn);
+        if (subscriber != null) {
             List<Call> calls = callsRepository.findByMsisdnAndCallDateTimeAfter(msisdn, LocalDate.now().atStartOfDay());
             return calls.size();
         } else {
@@ -86,19 +86,19 @@ public class SubscriberController {
         if (getCallForToday(msisdn) >= maxCallNumInADay) {
             model.addAttribute("result", "Превышен лимит звонков (" + maxCallNumInADay + ") в сутки");
         } else {
-            Subscriber s = subsRepo.findByMsisdn(msisdn);
-            if (s != null) {
-                int b = s.getBalance();
-                if (b - price.getCallPrice() >= 0) {
-                    s.setBalance(b - price.getCallPrice());
-                    s.setStatus(s.getBalance() > 0 ? Constants.ACTIVE : Constants.BLOCKED);
+            Subscriber subscriber = subsRepo.findByMsisdn(msisdn);
+            if (subscriber != null) {
+                int balance = subscriber.getBalance();
+                if (balance - price.getCallPrice() >= 0) {
+                    subscriber.setBalance(balance - price.getCallPrice());
+                    subscriber.setStatus(subscriber.getBalance() > 0 ? SubscriberStatus.ACTIVE : SubscriberStatus.BLOCKED);
                     callsRepository.save(new Call(LocalDateTime.now(), msisdn));
                     model.addAttribute("result", "Звонок выполнен. Звонков за сегодня " + getCallForToday(msisdn));
                 } else {
                     model.addAttribute("result", "Не достаточно средств для звонка.");
                 }
 
-                subsRepo.save(s);
+                subsRepo.save(subscriber);
             } else {
                 return subscriberDoesNotExistsError(msisdn, model);
             }
@@ -120,18 +120,18 @@ public class SubscriberController {
         log.debug("Executing sendSMSPage with msisdn = " + msisdn);
         model.addAttribute("msisdn", msisdn);
         Price price = pricesRepo.findAll(Sort.by(Sort.Direction.DESC, "id")).get(0);
-        Subscriber s = subsRepo.findByMsisdn(msisdn);
-        if (s != null) {
-            int b = s.getBalance();
-            if (b - price.getSmsPrice() >= 0) {
-                s.setBalance(b - price.getSmsPrice());
-                s.setStatus(s.getBalance() > 0 ? Constants.ACTIVE : Constants.BLOCKED);
+        Subscriber subscriber = subsRepo.findByMsisdn(msisdn);
+        if (subscriber != null) {
+            int balance = subscriber.getBalance();
+            if (balance - price.getSmsPrice() >= 0) {
+                subscriber.setBalance(balance - price.getSmsPrice());
+                subscriber.setStatus(subscriber.getBalance() > 0 ? SubscriberStatus.ACTIVE : SubscriberStatus.BLOCKED);
                 model.addAttribute("result", "SMS отправлена");
             } else {
                 model.addAttribute("result", "Не достаточно средств для отправки SMS.");
             }
 
-            subsRepo.save(s);
+            subsRepo.save(subscriber);
         } else {
             return subscriberDoesNotExistsError(msisdn, model);
         }
@@ -151,11 +151,11 @@ public class SubscriberController {
     public String replenishBalancePage(@RequestParam("msisdn") String msisdn, Model model) {
         log.debug("Executing replenishBalancePage with msisdn = " + msisdn);
         model.addAttribute("msisdn", msisdn);
-        Subscriber s = subsRepo.findByMsisdn(msisdn);
-        if (s != null) {
-            ReplenishBalance b = new ReplenishBalance();
-            b.setMsisdn(msisdn);
-            model.addAttribute("repleinesh", b);
+        Subscriber subscriber = subsRepo.findByMsisdn(msisdn);
+        if (subscriber != null) {
+            ReplenishBalance balance = new ReplenishBalance();
+            balance.setMsisdn(msisdn);
+            model.addAttribute("repleinesh", balance);
 
         } else {
             return subscriberDoesNotExistsError(msisdn, model);
@@ -175,15 +175,16 @@ public class SubscriberController {
     public String replenishBalanceSubmit(@ModelAttribute ReplenishBalance balance, Model model) {
         log.debug("Executing replenishBalanceSubmit with msisdn = " + balance.getMsisdn());
         model.addAttribute("msisdn", balance.getMsisdn());
-        Subscriber s = subsRepo.findByMsisdn(balance.getMsisdn());
-        if (s != null) {
+        Subscriber subscriber = subsRepo.findByMsisdn(balance.getMsisdn());
+        if (subscriber != null) {
             if (balance.getAmount() > 0) {
-                s.setBalance(s.getBalance() + balance.getAmount());
+                subscriber.setBalance(subscriber.getBalance() + balance.getAmount());
+                subscriber.setStatus(subscriber.getBalance() > 0 ? SubscriberStatus.ACTIVE : SubscriberStatus.BLOCKED);
             } else {
                 return negativeAmountError(balance.getMsisdn(), model);
             }
-            subsRepo.save(s);
-            model.addAttribute("result", "Баланс успешно пополнен. Текущий баланс = " + s.getBalance());
+            subsRepo.save(subscriber);
+            model.addAttribute("result", "Баланс успешно пополнен. Текущий баланс = " + subscriber.getBalance());
         } else {
             return subscriberDoesNotExistsError(balance.getMsisdn(), model);
         }
